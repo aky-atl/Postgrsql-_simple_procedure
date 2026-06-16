@@ -1,0 +1,27 @@
+CREATE OR REPLACE PROCEDURE safe_insert(
+  p_name   VARCHAR,
+  p_salary NUMERIC
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF p_salary < 0 THEN
+    RAISE EXCEPTION
+      USING MESSAGE = 'Salary cannot be negative',
+            ERRCODE = '22023';
+  END IF;
+
+  INSERT INTO employees(name, salary)
+  VALUES (p_name, p_salary);
+
+EXCEPTION
+  WHEN unique_violation THEN
+    RAISE NOTICE 'Duplicate entry detected.';
+  WHEN invalid_parameter_value THEN
+    RAISE NOTICE 'Invalid value: %', SQLERRM;
+  WHEN OTHERS THEN
+    RAISE NOTICE 'Unexpected error: %', SQLERRM;
+END;
+$$;
+
+CALL safe_insert('Ravi', -100);
