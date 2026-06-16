@@ -1,0 +1,23 @@
+-- Create table
+CREATE TABLE employees (
+  id     SERIAL PRIMARY KEY,
+  name   VARCHAR(100),
+  salary NUMERIC
+);
+
+-- Create procedure
+CREATE OR REPLACE PROCEDURE add_employee(
+  p_name   VARCHAR,
+  p_salary NUMERIC
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  INSERT INTO employees(name, salary)
+  VALUES (p_name, p_salary);
+  RAISE NOTICE 'Employee % added.', p_name;
+END;
+$$;
+
+-- Call
+CALL add_employee('Kumar', 54210);
