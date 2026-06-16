@@ -1,0 +1,29 @@
+CREATE OR REPLACE PROCEDURE get_employee_info(
+  p_id      INT,
+  OUT p_name   VARCHAR,
+  OUT p_salary NUMERIC
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  SELECT name, salary
+  INTO   p_name, p_salary
+  FROM   employees
+  WHERE  id = p_id;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Employee % not found.', p_id;
+  END IF;
+END;
+$$;
+
+-- Call and capture output
+DO $$
+DECLARE
+  v_name   VARCHAR;
+  v_salary NUMERIC;
+BEGIN
+  CALL get_employee_info(1, v_name, v_salary);
+  RAISE NOTICE 'Name: %, Salary: %', v_name, v_salary;
+END;
+$$;
