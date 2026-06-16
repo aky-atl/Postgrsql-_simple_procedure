@@ -1,0 +1,24 @@
+CREATE OR REPLACE PROCEDURE transfer_salary(
+  p_from_id INT,
+  p_to_id   INT,
+  p_amount  NUMERIC
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  UPDATE employees SET salary = salary - p_amount
+  WHERE id = p_from_id;
+
+  UPDATE employees SET salary = salary + p_amount
+  WHERE id = p_to_id;
+
+  COMMIT;
+  RAISE NOTICE 'Transfer of % completed.', p_amount;
+
+EXCEPTION WHEN OTHERS THEN
+  ROLLBACK;
+  RAISE NOTICE 'Transfer failed, rolled back.';
+END;
+$$;
+
+CALL transfer_salary(1, 2, 5000);
