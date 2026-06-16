@@ -1,0 +1,25 @@
+CREATE OR REPLACE PROCEDURE give_raise(
+  p_percent NUMERIC
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+  FOR rec IN
+    SELECT id, name, salary FROM employees
+  LOOP
+    UPDATE employees
+    SET    salary = rec.salary * (1 + p_percent / 100)
+    WHERE  id = rec.id;
+
+    RAISE NOTICE 'Updated % → new salary: %',
+      rec.name,
+      ROUND(rec.salary * (1 + p_percent / 100), 2);
+  END LOOP;
+
+  RAISE NOTICE 'Raise of %%% applied to all.', p_percent;
+END;
+$$;
+
+CALL give_raise(10);  -- 10% raise for everyone
