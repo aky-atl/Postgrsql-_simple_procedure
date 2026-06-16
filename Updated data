@@ -1,0 +1,20 @@
+CREATE OR REPLACE PROCEDURE update_salary(
+  p_id     INT,
+  p_salary NUMERIC
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM employees WHERE id = p_id) THEN
+    RAISE EXCEPTION 'Employee ID % not found.', p_id;
+  END IF;
+
+  UPDATE employees
+  SET    salary = p_salary
+  WHERE  id = p_id;
+
+  RAISE NOTICE 'Salary updated for ID %', p_id;
+END;
+$$;
+
+CALL update_salary(1, 65000);
