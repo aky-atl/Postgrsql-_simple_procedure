@@ -1,0 +1,21 @@
+CREATE OR REPLACE PROCEDURE delete_employee(
+  p_id INT
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_count INT;
+BEGIN
+  SELECT COUNT(*) INTO v_count
+  FROM employees WHERE id = p_id;
+
+  IF v_count = 0 THEN
+    RAISE EXCEPTION 'No employee with ID %', p_id;
+  END IF;
+
+  DELETE FROM employees WHERE id = p_id;
+  RAISE NOTICE 'Employee % deleted.', p_id;
+END;
+$$;
+
+CALL delete_employee(3);
