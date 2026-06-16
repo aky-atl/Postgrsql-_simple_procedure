@@ -1,0 +1,24 @@
+CREATE OR REPLACE PROCEDURE archive_table(
+  p_table  TEXT,
+  p_schema TEXT DEFAULT 'public'
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_archive TEXT;
+  v_sql     TEXT;
+BEGIN
+  v_archive := p_table || '_archive';
+
+  v_sql := format(
+    'CREATE TABLE IF NOT EXISTS %I.%I AS SELECT * FROM %I.%I',
+    p_schema, v_archive, p_schema, p_table
+  );
+
+  EXECUTE v_sql;
+
+  RAISE NOTICE 'Archived % → %', p_table, v_archive;
+END;
+$$;
+
+CALL archive_table('employees');
